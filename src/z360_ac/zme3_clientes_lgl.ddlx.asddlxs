@@ -34,6 +34,7 @@ annotate entity zcds_clientes_lgl with
                           position: 10 }]
             }
   IdCliente;
+  
   @UI : { lineItem: [{ position: 20,
                        importance: #HIGH }],
            fieldGroup: [{ qualifier: 'DetallesCliente',
