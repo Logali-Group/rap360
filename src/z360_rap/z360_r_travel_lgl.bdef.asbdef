@@ -68,15 +68,15 @@ etag master LocalLastChangedAt
     validation validateDates;
     validation validateBookingFee;
 
-    //    validation Booking~validateCustomer;
-    //    validation Booking~validateConnection;
-    //    validation Booking~validateCurrency;
-    //    validation Booking~validateFlightPrice;
-    //    validation Booking~validateStatus;
-    //
-    //    validation BookingSupplement~validateSupplment;
-    //    validation BookingSupplement~validateCurrency;
-    //    validation BookingSupplement~validatePrice;
+    validation Booking~validateCustomer;
+    validation Booking~validateConnection;
+    validation Booking~validateCurrency;
+    validation Booking~validateFlightPrice;
+    validation Booking~validateStatus;
+
+    validation BookingSupplement~validateSupplement;
+    validation BookingSupplement~validateCurrency;
+    validation BookingSupplement~validatePrice;
 
   }
 
@@ -127,7 +127,33 @@ etag master LocalLastChangedAt
 
   validation validateCustomer on save { create; field CustomerID; }
   validation validateConnection on save { create; field AirlineID, ConnectionID, FlightDate; }
+  validation validateCurrency on save { create; field CurrencyCode; }
+  validation validateFlightPrice on save { create; field FlightPrice; }
+  validation validateStatus on save { create; field BookingStatus; }
 
+  determine action validateFlightCosts { validation validateFlightPrice; }
+
+  side effects
+  {
+    field FlightPrice affects field _Travel.TotalPrice;
+    determine action validateFlightCosts executed on field CustomerID affects messages;
+  }
+
+  mapping for z360_booking_a
+    {
+      BookingUUID        = booking_uuid;
+      TravelUUID         = parent_uuid;
+      BookingID          = booking_id;
+      BookingDate        = booking_date;
+      CustomerID         = customer_id;
+      AirlineID          = carrier_id;
+      ConnectionID       = connection_id;
+      FlightDate         = flight_date;
+      FlightPrice        = flight_price;
+      CurrencyCode       = currency_code;
+      BookingStatus      = booking_status;
+      LocalLastChangedAt = local_last_changed_at;
+    }
 }
 
 define behavior for z360_r_bookingsuppl_lgl alias BookingSupplement
@@ -146,5 +172,33 @@ etag master LocalLastChangedAt
 
 
   field ( numbering : managed, readonly ) BookSupplUUID;
-  field ( readonly ) TravelUUID, BookingUUID;
+  field ( readonly ) TravelUUID, BookingUUID, BookingSupplementID, LocalLastChangedAt;
+  field ( mandatory ) SupplementID, Price, CurrencyCode;
+
+  determination setBookingSupplNumber on save { create; }
+  determination calculateTotalPrice on save { create; field Price, CurrencyCode; }
+
+  validation validateSupplement on save { create; field SupplementID; }
+  validation validateCurrency on save { create; field CurrencyCode; }
+  validation validatePrice on save { create; field Price; }
+
+  determine action validateSupplementPrice { validation validatePrice; }
+
+  side effects
+  {
+    field Price affects field _Travel.TotalPrice;
+    determine action validateSupplementPrice executed on field Price affects messages;
+  }
+
+  mapping for z360_bksuppl_a
+    {
+      BookSupplUUID       = booksuppl_uuid;
+      TravelUUID          = root_uuid;
+      BookingUUID         = parent_uuid;
+      BookingSupplementID = booking_supplement_id;
+      SupplementID        = supplement_id;
+      Price               = price;
+      CurrencyCode        = currency_code;
+      LocalLastChangedAt  = local_last_changed_at;
+    }
 }

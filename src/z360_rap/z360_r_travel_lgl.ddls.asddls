@@ -13,7 +13,7 @@ define root view entity z360_r_travel_lgl
 
 
 {
-  key travel_uuid           as TravelUUID,
+  key travel_uuid           as TravelUUID, 
       travel_id             as TravelID,
       agency_id             as AgencyID,
       customer_id           as CustomerID,

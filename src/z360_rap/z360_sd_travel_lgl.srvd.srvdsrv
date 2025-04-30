@@ -1,0 +1,6 @@
+@EndUserText.label: 'Travel'
+define service Z360_sd_travel_lgl {
+  expose z360_c_travel_lgl       as Travel;
+  expose z360_c_booking_lgl      as Booking;
+  expose z360_c_bookingsuppl_lgl as BookingSupplement;
+}
